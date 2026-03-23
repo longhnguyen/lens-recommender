@@ -1,7 +1,10 @@
 package com.longnguyen.lensrecommender.rules;
 
-public enum ScoreType
-{
+/**
+ * Individual score types that aggregate into the final lens score
+ */
+public enum ScoreType {
+
     FOCAL_LENGTH,
     APERTURE,
     USABILITY

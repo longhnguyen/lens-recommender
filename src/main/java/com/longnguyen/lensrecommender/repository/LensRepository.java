@@ -4,7 +4,8 @@ import com.longnguyen.lensrecommender.model.entity.Lens;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Database access for the Lens table
+ */
 @Repository
-public interface LensRepository extends JpaRepository<Lens, Integer>
-{
-}
+public interface LensRepository extends JpaRepository<Lens, Integer> {}

@@ -5,9 +5,13 @@ import com.longnguyen.lensrecommender.model.entity.Lens;
 import com.longnguyen.lensrecommender.profile.PurposeProfile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Scores a lens based on usability, primarily whether it aligns with the user’s zoom preference.
+ * Provides a simple trade-off between flexibility (zoom) and simplicity (prime)
+ */
 @Component
-public class UsabilityRule implements RecommendationRule
-{
+public class UsabilityRule implements RecommendationRule {
+
     @Override
     public RuleScore score(Camera camera, Lens lens, PurposeProfile profile) {
 

@@ -16,17 +16,35 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service responsible for generating lens recommendations.
+ *
+ * Combines:
+ * - Camera resolution (direct or via alias)
+ * - Compatibility filtering
+ * - Rule-based scoring
+ */
 @Service
-public class RecommendationService
-{
-    /** Dependencies */
+public class RecommendationService {
+
+    /** Repository for resolving Camera data */
     private final CameraRepository cameraRepository;
+
+    /** Repository for resolving Camera Alias data */
     private final CameraAliasRepository cameraAliasRepository;
+
+    /** Repository for resolving Lens data */
     private final LensRepository lensRepository;
+
+    /** Service that checks compatibility between lenses and cameras */
     private final CompatibilityService compatibilityService;
+
+    /** Orchestrator of all rules used in the score calculations */
     private final RulesEngine rulesEngine;
 
-    /** Injected dependencies via constructor */
+    /**
+     * Dependency Injection via constructor method
+     */
     public RecommendationService(CameraRepository cameraRepository,
             CameraAliasRepository cameraAliasRepository,
             LensRepository lensRepository,
@@ -39,15 +57,26 @@ public class RecommendationService
         this.rulesEngine = rulesEngine;
     }
 
-    /** Logic for lens recommendations */
+    /**
+     * Generates a ranked list of lens recommendations for a given request.
+     *
+     * Workflow:
+     * 1. Resolve camera by model or alias
+     * 2. Filter lenses compatible with the camera
+     * 3. Score lenses using the rules engine
+     * 4. Sort by total score (descending)
+     * 5. Return top results
+     *
+     * @param request user input defining camera and intended use
+     * @return top matching lenses sorted by score
+     */
     public List<LensResponse> recommendLenses(RecommendationRequest request) {
 
-        // Request fields
         CameraBrand cameraBrand = request.cameraBrand();
         String cameraModel = request.cameraModel();
         PurposeProfile purposeProfile = request.purpose();
 
-        // Fetch camera from database
+        // Resolve camera either directly or via alias fallback
         final Camera camera = cameraRepository.findByModel(cameraModel)
                 .orElseGet(() -> cameraAliasRepository.findByAliasAndCamera_Brand(
                                 cameraModel, cameraBrand)
@@ -55,9 +84,9 @@ public class RecommendationService
                         .getCamera());
 
         return lensRepository.findAll().stream()
-                // Filter lenses compatible with camera/mount
+                // Filter lenses compatible with a camera's mount type and sensor size
                 .filter(lens -> compatibilityService.isCameraCompatible(camera, lens))
-                // Calculate scores for lenses
+                // Score lenses using rule engine based on intended purpose
                 .map(lens -> {
                     Map<ScoreType, Integer> scores = rulesEngine.score(camera, lens, purposeProfile);
                     return new ScoredLens(lens, scores.get(ScoreType.FOCAL_LENGTH),
@@ -68,7 +97,7 @@ public class RecommendationService
                 .map(LensResponse::fromLens)
                 // Sort lenses by descending score
                 .sorted(Comparator.comparingInt(LensResponse::totalScore).reversed())
-                // Only return top 5 matches
+                // Only return top 10 matches
                 .limit(10)
                 .toList();
     }

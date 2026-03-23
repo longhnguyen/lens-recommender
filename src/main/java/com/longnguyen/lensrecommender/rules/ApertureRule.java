@@ -5,13 +5,16 @@ import com.longnguyen.lensrecommender.model.entity.Lens;
 import com.longnguyen.lensrecommender.profile.PurposeProfile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Scores a lens based on its maximum aperture and the user's aperture preference.
+ * Favours faster lenses (lower f-number) when wide aperture is preferred
+ */
 @Component
-public class ApertureRule implements RecommendationRule
-{
+public class ApertureRule implements RecommendationRule {
+
     @Override
     public RuleScore score(Camera camera, Lens lens, PurposeProfile profile) {
 
-        // Lens aperture
         double aperture = lens.getMaxAperture();
 
         double baseScore;

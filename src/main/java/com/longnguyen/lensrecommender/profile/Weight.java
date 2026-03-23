@@ -2,17 +2,13 @@ package com.longnguyen.lensrecommender.profile;
 
 import lombok.Getter;
 
+/**
+ * Weight value to be multiplied against a base score to determine the resulting weighted score
+ */
 @Getter
-public enum Weight
-{
-    LOW (1),
-    MEDIUM (2),
-    HIGH (3);
+public enum Weight {
 
-    /** Variables */
-    private final int multiplier;
-
-    Weight(int multiplier) {
-        this.multiplier = multiplier;
-    }
+    LOW,
+    MEDIUM,
+    HIGH
 }

@@ -1,7 +1,10 @@
 package com.longnguyen.lensrecommender.model.enums;
 
-public enum SensorSize
-{
+/**
+ * A camera's sensor size
+ */
+public enum SensorSize {
+
     APS_C,
     FULL_FRAME,
     MEDIUM,
